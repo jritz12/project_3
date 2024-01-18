@@ -10,24 +10,39 @@ d3.csv("data.csv", function(data){
    //console.log(data.Pop_Est)
    
 })
-    d3.csv("data.csv").then((d) => {
+const config = {
+  locateFile: filename => (
+    'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.wasm'
+  )
+}
+
+const sqlPromise = initSqlJs(config)
+
+const dataPromise = fetch((
+  'aqi_updated_db.sqlite'
+))
+  .then(res => res.arrayBuffer())
+
+Promise.all([sqlPromise, dataPromise])
+  .then(([SQL, buf]) => {
+    const db = new SQL.Database(new Uint8Array(buf))
+    const filteredData = db.exec('SELECT * FROM aqi')[0].values
+
+
+console.log(filteredData)
         let stateData =[]
         let stateName = []
         let allData = []
-        let years = []
         
-        for(let i=0; i<51;i++) {
-            stateData.push(parseInt(d[i].Median_AQI))
-            stateName.push(d[i].State)
+        for(let i=1; i<52;i++) {
+            stateData.push(parseInt(filteredData[i][17]))
+            stateName.push(filteredData[i][1])
             
             
         }
-        for(let i =0;i<d.length;i++) {
-            allData.push(parseInt(d[i].Median_AQI))
-            years.push(d[i].Year)
+        for(let i =1;i<filteredData.length;i++) {
+            allData.push(parseInt(filteredData[i][17]))
         }
-       
-        console.log(years)
   
 
 
@@ -84,14 +99,11 @@ function run() {
     
     for(let j = 0; j<51; j++) {
       data[j]=allData[i+j]
-     
-      
       
 
     }
 
    }
-   console.log(data[0])
 
  
   myChart.setOption({
@@ -109,11 +121,11 @@ function run() {
 setTimeout(function () {
     
   run();
-  
 }, 0);
 setInterval(function () {
   //run();
 }, 3000);
 
 option && myChart.setOption(option);
+
 });
