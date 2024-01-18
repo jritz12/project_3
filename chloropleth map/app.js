@@ -11,8 +11,23 @@ const map = L.map('map').setView([37.8, -96], 4);
     
     
     function runData(dataset, callback) {
-        d3.csv("data.csv").then((data) => {
-            const filteredData = data.filter(row => row.Year == dataset);
+        const config = {
+            locateFile: filename => (
+              'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.wasm'
+            )
+          }
+          
+          const sqlPromise = initSqlJs(config)
+          
+          const dataPromise = fetch((
+            'aqi_updated_db.sqlite'
+          ))
+            .then(res => res.arrayBuffer())
+          
+          Promise.all([sqlPromise, dataPromise])
+            .then(([SQL, buf]) => {
+              const db = new SQL.Database(new Uint8Array(buf))
+              const filteredData = db.exec('SELECT * FROM aqi')
             callback(filteredData);
             
         });
@@ -44,19 +59,16 @@ const map = L.map('map').setView([37.8, -96], 4);
         let year = dropdownMenu.property("value");
     
         runData(year, (filteredData) => {
-
-            
-
+            let aqi_data = filteredData[0].values
            
             
 
-            for(let i = 0; i <51;i++) {
-                colors.push(getColor(filteredData[i].Max_AQI))
-                states.push(filteredData[i].State)
-                AQI_Value.push(filteredData[i].Max_AQI)
+            for(let i = (year-1980)*51+1; i <(year-1980)*51+52;i++) {
+                colors.push(getColor(aqi_data[i][15]))
+                states.push(aqi_data[i][1])
+                AQI_Value.push(aqi_data[i][15])
 
             }
-            
 
             function style(feature) {
                 var color
