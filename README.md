@@ -15,10 +15,10 @@ This dataset was modified from data originally collected and aggregated by the E
 
 
 ## External Code Usage
-Starter code for the three javascript files can be found here:
+Starter code for the three javascript files and their associated html files can be found here:
 
-index.js - https://leafletjs.com/examples/choropleth/
+index.js/html - https://leafletjs.com/examples/choropleth/
 
-index2.js - https://echarts.apache.org/examples/en/editor.html?c=bar-race
+index2.js/html - https://echarts.apache.org/examples/en/editor.html?c=bar-race
 
-index3.js - https://plotly.com/javascript/dropdowns/
+index3.js/html - https://plotly.com/javascript/dropdowns/
