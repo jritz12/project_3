@@ -1,118 +1,185 @@
-var chartDom = document.getElementById('main');
-var myChart = echarts.init(chartDom);
-var option;
+
+const map = L.map('map').setView([37.8, -96], 4);
+
+	const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+		maxZoom: 19,
+		attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+	}).addTo(map);
+    
 
 
+    
+    
+    function runData(dataset, callback) {
+        const config = {
+            locateFile: filename => (
+              'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.wasm'
+            )
+          }
+          
+          const sqlPromise = initSqlJs(config)
+          
+          const dataPromise = fetch((
+            'aqi_updated_db.sqlite'
+          ))
+            .then(res => res.arrayBuffer())
+          
+          Promise.all([sqlPromise, dataPromise])
+            .then(([SQL, buf]) => {
+              const db = new SQL.Database(new Uint8Array(buf))
+              const filteredData = db.exec('SELECT * FROM aqi')
+            callback(filteredData);
+            
+        });
+    }
+    
+ 
+    
+    
+    
+    function optionChanged() {
 
-
-//d3.csv("data.csv", function(data){
-   //console.log(data.Pop_Est)
-   
-//})
-    d3.csv("data.csv").then((d) => {
-        let stateData =[]
-        let stateName = []
-        let allData = []
-        let years = []
         
-        for(let i=0; i<51;i++) {
-            stateData.push(parseInt(d[i].Median_AQI))
-            stateName.push(d[i].State)
-            
-            
+        
+        if(document.getElementsByClassName("info leaflet-control")) {
+
+            var element = document.getElementsByClassName("info leaflet-control")
+            while(element[0]) {
+                element[0].parentNode.removeChild(element[0]);
+            }
         }
-        for(let i =0;i<d.length;i++) {
-            allData.push(parseInt(d[i].Median_AQI))
-            years.push(d[i].Year)
-        }
+
+
        
-        console.log(years)
-  
-
-
-const data = stateData
-
-option = {
-  xAxis: {
-    max: 80 
-  },
-  yAxis: {
-    type: 'category',
-    data: stateName,
-    axisLabel: {
-      width:1,
-      setInterval: 0,
-      rotate: 30
-    },
-    inverse: true,
-    animationDuration: 300,
-    animationDurationUpdate: 500,
-    max: 19 // only the largest 10 bars will be displayed
-  },
-  series: [
-    {
-      realtimeSort: true,
-      
-      type: 'bar',
-      data: data,
-      colorBy: data,
-      label: {
-        show: true,
-        position: 'right',
-        valueAnimation: true
-      }
-    }
-  ],
-  legend: {
-    show: true
-  },
-  animationDuration: 0,
-  animationDurationUpdate: 10000,
-  animationEasing: 'linear',
-  animationEasingUpdate: 'linear'
-};
-
-function restart() {
-  console.log('button pressed')
- 
-}
-
-function run() { 
-  
-   for(let i =51; i<allData.length;i+=51){
+         
+        let colors = []
+        let states = []
+        let AQI_Value = []
+        let dropdownMenu = d3.select("#selDataset");
+        let year = dropdownMenu.property("value");
     
-    for(let j = 0; j<51; j++) {
-      data[j]=allData[i+j]
-     
-      
-      
+        runData(year, (filteredData) => {
+            let aqi_data = filteredData[0].values
+           
+            
 
+            for(let i = (year-1980)*51+1; i <(year-1980)*51+52;i++) {
+                colors.push(getColor(aqi_data[i][15]))
+                states.push(aqi_data[i][1])
+                AQI_Value.push(aqi_data[i][15])
+
+            }
+
+            function style(feature) {
+                var color
+                
+                for(let i = 0; i <51;i++){
+                    color = colors[states.indexOf(feature.properties.name)]
+                    
+                }
+                
+                
+                
+                return {
+                    fillColor: color,
+                    weight: 2,
+                    opacity: 1,
+                    color: 'white',
+                    dashArray: '3',
+                    fillOpacity: 0.7
+                };
+            }
+            function highlightFeature(e) {
+                var layer = e.target;
+            
+                layer.setStyle({
+                    weight: 5,
+                    color: '#666',
+                    dashArray: '',
+                    fillOpacity: 0.7
+                });
+            
+                layer.bringToFront();
+                info.update(layer.feature.properties);
+            }
+            function resetHighlight(e) {
+                geojson.resetStyle(e.target);
+                info.update();
+            }
+            function zoomToFeature(e) {
+                map.fitBounds(e.target.getBounds());
+            }
+            function onEachFeature(feature, layer) {
+                layer.on({
+                    mouseover: highlightFeature,
+                    mouseout: resetHighlight,
+                    click: zoomToFeature
+                });
+            }
+        
+           
+           
+            const info = L.control();
+            info.onAdd = function (map) {
+                this._div = L.DomUtil.create('div', 'info');
+                this.update();
+                return this._div;
+            };
+            info.update = function (props) {
+        
+                const contents = props ? `<b>${props.name}</b><br />${Math.round(AQI_Value[states.indexOf(props.name)])}` : 'Hover over a state';
+                this._div.innerHTML = `<h4>Max Recorded AQI</h4>${contents}`;
+            };
+            info.addTo(map);
+        
+            
+            
+            
+            
+         L.geoJson(statesData, {style: style}).addTo(map);
+         geojson = L.geoJson(statesData, {
+            style: style,
+            onEachFeature: onEachFeature
+        }).addTo(map);
+        
+           
+        });
+        
     }
-
-   }
-   console.log(data[0])
-
- 
-  myChart.setOption({
-    series: [
-      {
-        type: 'bar',
-        data,
-        barWidth: "80%"
-      }
-    ]
-  });
-}
-
-
-setTimeout(function () {
     
-  run();
-  
-}, 0);
-setInterval(function () {
-  //run();
-}, 3000);
 
-option && myChart.setOption(option);
-});
+
+    function getColor(d) {
+        return d > 300 ? '#7e0022' :
+               d > 200  ? '#99004c' :
+               d > 150  ? '#ff0000' :
+               d > 100  ? '#ff7d00' :
+               d > 50   ? '#fefe00' :
+               d > 0   ? '#00e400' :
+                        '#adadad';
+            
+    }
+    const legend = L.control({position: 'bottomright'});
+        
+    legend.onAdd = function (map) {
+        var div = L.DomUtil.create("div", "legend");
+
+        div.innerHTML += '<i style="background: #adadad"></i><span>No Data</span><br>';
+        div.innerHTML += '<i style="background: #00e400"></i><span>0-50</span><br>';
+        div.innerHTML += '<i style="background: #fefe00"></i><span>50-100</span><br>';
+        div.innerHTML += '<i style="background: #ff7d00"></i><span>100-150</span><br>';
+        div.innerHTML += '<i style="background: #ff0000"></i><span>150-200</span><br>';
+        div.innerHTML += '<i style="background: #99004c"></i><span>200-300</span><br>';
+        div.innerHTML += '<i style="background: #7e0022"></i><span>300-500</span><br>';
+
+        
+        return div;
+    };
+
+	legend.addTo(map);
+
+    
+    
+    
+
+    
