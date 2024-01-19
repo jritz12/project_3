@@ -21,7 +21,7 @@ const config = {
 
 
 var stateName = []
-var variables = ['Median AQI', 'Max AQI', 'Percent of days measured', 'Percent of counties reporting', 'Pop_Est']
+var variables = ['Median AQI', 'Max AQI', 'Percent of Days Measured', 'Percent of Counties Reporting', 'Population Estimate','Percent of Days Below Unhealthy']
 
 for(let i=1; i<52;i++) {
     stateName.push(filteredData[i][1])
@@ -37,20 +37,27 @@ for(let i=1; i<52;i++) {
     }
   };
 
-// Default Country Data
+// Default State Data
 setBubblePlot('Alabama', 'Median AQI');
   
 function setBubblePlot(chosenState, variable) {
-    getStateData(chosenState, variable);  
-
+    getStateData(chosenState, variable);
+    var colors = ['#1f77b4', '#9467bd', '#bcbd22','#17becf','#d62728','#2ca02c','#e377c2']
+    let color = colors[variables.indexOf(variable)]
     var trace1 = {
       x: currentYear,
       y: aqiData,
       mode: 'lines+markers',
+      line: {
+        width:1,
+        color: color
+      },
       marker: {
         size: 12, 
-        opacity: 0.5
-      }
+        opacity: 0.5,
+        color: color
+      },
+
     };
    
 
