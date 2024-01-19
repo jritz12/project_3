@@ -22,3 +22,5 @@ index.js/html - https://leafletjs.com/examples/choropleth/
 index2.js/html - https://echarts.apache.org/examples/en/editor.html?c=bar-race
 
 index3.js/html - https://plotly.com/javascript/dropdowns/
+
+Additionally, code for segments of index.html (commented within the code) was gotten from: https://stackoverflow.com/questions/46572406/appending-text-and-value-when-creating-newoption-with-javascript and https://stackoverflow.com/questions/9895082/javascript-populate-drop-down-list-with-array
