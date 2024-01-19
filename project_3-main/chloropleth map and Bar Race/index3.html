@@ -1,0 +1,38 @@
+<head>
+    <!--Plotly.js-->
+            <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.js"></script>
+    </head>
+            <body>
+    <div class="showcase__section" id="bubble">
+      <div class="spacer --small"></div>
+      <div id="bubbleplots">
+        <div class="bubbleplot" data-num="0">
+          <div class="plot" id="plotdiv"></div>
+          <div class="control-row">
+            State: <select class="statedata">
+            </select>
+        <div class="control-row">
+            Data Type: <select class="datatype">
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+          
+    <script type="text/javascript" src = "index3.js">
+            
+            </script>
+            <script>
+                function change_to_map(){
+                    window.location.href = "index.html";
+                  } </script>
+                <input type="button" value="View Chloropleth Map" onclick="change_to_map()"/>
+                <script>
+                    function change_page(){
+                        window.location.href = "index2.html";
+                      } </script>
+                    <input type="button" value="View Bar Race" onclick="change_page()"/>
+            </body>
+    
+            
