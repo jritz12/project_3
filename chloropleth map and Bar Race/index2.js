@@ -1,35 +1,28 @@
+// initializes echart
 var chartDom = document.getElementById('main');
 var myChart = echarts.init(chartDom);
 var option;
 
-
-
-
-
-d3.csv("data.csv", function(data){
-   //console.log(data.Pop_Est)
-   
-})
+// required for sql.js to function
 const config = {
   locateFile: filename => (
     'https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.5.0/sql-wasm.wasm'
   )
 }
-
+// initializes sql.js 
 const sqlPromise = initSqlJs(config)
-
+// acquires data promise from the local database file  
 const dataPromise = fetch((
   'aqi_updated_db.sqlite'
 ))
   .then(res => res.arrayBuffer())
-
+// stores all the data from the database as a constant 
 Promise.all([sqlPromise, dataPromise])
   .then(([SQL, buf]) => {
     const db = new SQL.Database(new Uint8Array(buf))
     const filteredData = db.exec('SELECT * FROM aqi')[0].values
 
-
-console.log(filteredData)
+// populating arrays with initial state data, state names, and all remaining data
         let stateData =[]
         let stateName = []
         let allData = []
@@ -47,10 +40,20 @@ console.log(filteredData)
 
 
 const data = stateData
-
+// creates the specifications for the bar race chart
 option = {
   xAxis: {
-    max: 80 
+    max: 80,
+    name: 'Median AQI',
+    nameLocation: 'end',
+    nameGap: 0,
+    nameTextStyle: {
+      fontSize: 20,
+      align: 'right',
+      verticalAlign: 'top',
+      padding: [30, 425, 0, 0], // centering the x axis
+    }
+
   },
   yAxis: {
     type: 'category',
@@ -60,10 +63,10 @@ option = {
       setInterval: 0,
       rotate: 30
     },
-    inverse: true,
+    inverse: true, // high to low
     animationDuration: 300,
     animationDurationUpdate: 500,
-    max: 19 // only the largest 10 bars will be displayed
+    max: 19 // only the largest 20 bars will be displayed
   },
   series: [
     {
@@ -88,9 +91,9 @@ option = {
   animationEasingUpdate: 'linear'
 };
 
-
+// function that sets the moving bar chart in motion
 function run() { 
-  
+// iterates on all data to pull the next data point for each state into the const data
    for(let i =51; i<allData.length;i+=51){
     
     for(let j = 0; j<51; j++) {
@@ -120,15 +123,12 @@ function run() {
   });
 }
 
-
+// can set an optional delay when page loads
 setTimeout(function () {
     
   run();
 }, 0);
-setInterval(function () {
-  //run();
-}, 3000);
-
+// if
 option && myChart.setOption(option);
 
 });
