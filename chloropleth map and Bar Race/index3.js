@@ -79,12 +79,12 @@ function setBubblePlot(chosenState, variable) {
 
     Plotly.newPlot('plotdiv', data, layout);
 };
-  
+// variables for the html selector, so everything can be called later with the correct class
 var innerContainer = document.querySelector('[data-num="0"'),
     plotEl = innerContainer.querySelector('.plot'),
     stateSelector = innerContainer.querySelector('.statedata');
     variableSelector = innerContainer.querySelector('.datatype');
-
+// provides all the options for both selectors when called
 function assignOptions(textArray, selector) {
   for (var i = 0; i < textArray.length;  i++) {
       var currentOption = document.createElement('option');
@@ -93,14 +93,14 @@ function assignOptions(textArray, selector) {
   }
 }
 
-
+// initializing the selectors
 assignOptions(stateName, stateSelector);
 assignOptions(variables, variableSelector)
-
+// updates the chart with new state and variable data when called 
 function updateState(){
     setBubblePlot(stateSelector.value, variableSelector.value);
 }
-  
+// calls previous chart update function when the selectors are changed  
 stateSelector.addEventListener('change', updateState, false);
 variableSelector.addEventListener('change', updateState, false);
 
