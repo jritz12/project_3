@@ -23,7 +23,7 @@ CREATE TABLE aqi(
   ,"Days Ozone"                          FLOAT(20) NOT NULL
   ,"Days PM25"                           FLOAT(21) NOT NULL
   ,"Days PM10"                           FLOAT(22) NOT NULL
-  ,"Percent of Days Measured"            FLOAT(19) NOT NULL
+  ,"Days Measured"            FLOAT(19) NOT NULL
   ,"Percent of Counties Reporting"       FLOAT(20) NOT NULL
   ,"Percent of Days Below Unhealthy"     FLOAT(18) NOT NULL
   ,"Population Estimate"                 INTEGER  NOT NULL

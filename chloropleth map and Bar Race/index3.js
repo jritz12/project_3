@@ -21,7 +21,7 @@ const config = {
 
 
 var stateName = []
-var variables = ['Median AQI', 'Max AQI', 'Percent of Days Measured', 'Percent of Counties Reporting', 'Population Estimate','Percent of Days Below Unhealthy']
+var variables = ['Median AQI', 'Max AQI', 'Days Measured', 'Percent of Counties Reporting', 'Population Estimate','Percent of Days Below Unhealthy']
 
 for(let i=1; i<52;i++) {
     stateName.push(filteredData[i][1])
